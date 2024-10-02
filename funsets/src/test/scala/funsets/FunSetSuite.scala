@@ -45,7 +45,7 @@ class FunSetSuite extends munit.FunSuite:
    * .ignore annotation.
    */
 
-    test("singleton set one contains one".ignore) {
+    test("singleton set one contains one") {
     
     /**
      * We create a new instance of the "TestSets" trait, this gives us access
@@ -67,7 +67,37 @@ class FunSetSuite extends munit.FunSuite:
       assert(!contains(s, 3), "Union 3")
   }
 
+  test("intersect does not contain all elements of each set") {
+    new TestSets:
+      val s = intersect(s1, s2)
+      assert(!contains(s, 1), "Intersect 1")
+      assert(!contains(s, 2), "Intersect 2")
+  }
 
+  test("intersect contains common elements") {
+    new TestSets:
+      val su = union(s1, s2)
+      val s = intersect(su, s2)
+      assert(!contains(s, 1), "Intersect 1")
+      assert(contains(s, 2), "Intersect 2")
+  }
+
+
+  test("diff shows difference") {
+    new TestSets:
+      val su = union(s1, s2)
+      val s = diff(su, s2)
+      assert(contains(s, 1), "Diff 1")
+      assert(!contains(s, 2), "Diff 2")
+  }
+
+  test("filter even") {
+    new TestSets:
+      val su = union(union(s1, s2), s3)
+      val s = filter(su, x => x % 2 == 0)
+      assert(!contains(s, 1), "filter 1")
+      assert(contains(s, 2), "filter 2")
+  }
 
   import scala.concurrent.duration.*
   override val munitTimeout = 10.seconds
