@@ -47,11 +47,13 @@ abstract class TweetSet extends TweetSetInterface:
    */
   def filterAcc(p: Tweet => Boolean, acc: TweetSet): TweetSet
 
-  def convertToList: TweetList = convertToListAcc(Empty())
+  def mostRetweetedAcc(tw: Tweet): Tweet
 
-  def convertToListAcc(acc: TweetList): TweetList
+  def descendingByRetweetAcc(acc: TweetList): TweetList
 
-  def isEmpty: Boolean
+//  def convertToList: TweetList = convertToListAcc(Empty())
+//
+//  def convertToListAcc(acc: TweetList): TweetList
 
   /**
    * Returns a new `TweetSet` that is the union of `TweetSet`s `this` and `that`.
@@ -81,7 +83,7 @@ abstract class TweetSet extends TweetSetInterface:
    * Question: Should we implement this method here, or should it remain abstract
    * and be implemented in the subclasses?
    */
-  def descendingByRetweet: TweetList = ???
+  def descendingByRetweet: TweetList
 
   /**
    * The following methods are already implemented
@@ -113,7 +115,11 @@ abstract class TweetSet extends TweetSetInterface:
 class Empty extends TweetSet:
   def filterAcc(p: Tweet => Boolean, acc: TweetSet): TweetSet = acc
 
-  def isEmpty: Boolean = true
+  def mostRetweetedAcc(tw: Tweet): Tweet = tw
+
+  def descendingByRetweet: TweetList = Nil
+
+  def descendingByRetweetAcc(acc: TweetList): TweetList = acc
 
   /**
    * The following methods are already implemented
@@ -131,15 +137,20 @@ class Empty extends TweetSet:
 
 class NonEmpty(elem: Tweet, left: TweetSet, right: TweetSet) extends TweetSet:
 
-  def isEmpty: Boolean = false
-
-  def convertToListAcc(acc: Tweetlist): TweetList = acc
+//  def convertToListAcc(acc: Tweetlist): TweetList = acc
 
   def filterAcc(p: Tweet => Boolean, acc: TweetSet): TweetSet =
     if p(elem) then
       right.filterAcc(p, left.filterAcc(p, acc.incl(elem)))
     else
       right.filterAcc(p, left.filterAcc(p, acc))
+  def descendingByRetweet: TweetList = descendingByRetweetAcc(Nil)
+
+
+  def descendingByRetweetAcc(acc: TweetList): TweetList =
+    val mostTw = mostRetweeted
+    val newList = Cons(mostTw, acc)
+    this.remove(mostTw).descendingByRetweetAcc(newList)
 
   /**
    * The following methods are already implemented
@@ -160,24 +171,13 @@ class NonEmpty(elem: Tweet, left: TweetSet, right: TweetSet) extends TweetSet:
     else
       this
 
-  def mostRetweeted: Tweet = ???
+  def mostRetweeted: Tweet = mostRetweetedAcc(elem)
 
-  def helper1(tw: Tweet): Tweet =
-    if tw.retweets > elem.retweets then tw else elem
+  def mostRetweetedAcc(tw: Tweet): Tweet =
+    val mostTw = if tw.retweets > elem.retweets then tw else elem
+    left.mostRetweetedAcc(right.mostRetweetedAcc(mostTw))
 
-  def convertToListAcc(acc: TweetList): TweetList =
-
-
-
-
-
-
-
-
-
-
-
-
+//  def convertToListAcc(acc: TweetList): TweetList =
 
   def remove(tw: Tweet): TweetSet =
     if tw.text < elem.text then

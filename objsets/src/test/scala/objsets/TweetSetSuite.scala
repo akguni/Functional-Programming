@@ -11,6 +11,13 @@ class TweetSetSuite extends munit.FunSuite:
     val set4d = set3.incl(d)
     val set5 = set4c.incl(d)
 
+<<<<<<< current
+=======
+    val e = Tweet("e", "e body", 50)
+    val set6 = set5.incl(e)
+
+
+>>>>>>> patched
   def asSet(tweets: TweetSet): Set[Tweet] =
     var res = Set[Tweet]()
     tweets.foreach(res += _)
@@ -55,6 +62,14 @@ class TweetSetSuite extends munit.FunSuite:
       assert(trends.head.user == "a" || trends.head.user == "b")
   }
 
+<<<<<<< current
+=======
+  test("mostRetweeted") {
+    new TestSets:
+      assert(set5.mostRetweeted.retweets == 20)
+      assert(set6.mostRetweeted.retweets == 50)
+  }
+>>>>>>> patched
 
   import scala.concurrent.duration.*
   override val munitTimeout = 10.seconds
