@@ -87,22 +87,14 @@ object Anagrams extends AnagramsInterface:
    *  in the example above could have been displayed in some other order.
    */
   def combinations(occurrences: Occurrences): List[Occurrences] =
-    def helper(occs: Occurrences) : List[Occurrences]= occs match
-        case Nil => List(Nil)
-        case x :: xs =>
-          val cs = combinations(xs)
-          val y = x match
-            case (c, o) =>
-              for i <- 1 to o yield (c, i)
-          def innerLoop(subs: Seq[(Char, Int)]): List[Occurrences] = subs match
-            case Nil => List(Nil)
-            case s :: ss =>
-              cs
-//              cs.map(elem => elem ::: List(s)) ::: cs
+    occurrences match
+      case Nil => List(Nil)
+      case x :: xs =>
+        def subs(hd: (Char, Int), rest: Occurrences, combs: List[Occurrences]): List[Occurrences] = hd match
+          case (_, 0) => Nil
+          case (c, i) => ((for co <- combs yield (c, i) :: co) ::: combs) ::: subs((c, i - 1), rest, combs)
 
-          innerLoop(y)
-
-    helper(occurrences)
+        subs(x, xs, combinations(xs))
 
 
   /** Subtracts occurrence list `y` from occurrence list `x`.
