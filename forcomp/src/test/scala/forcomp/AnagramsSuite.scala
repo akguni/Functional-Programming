@@ -60,10 +60,54 @@ class AnagramsSuite extends munit.FunSuite:
     assertEquals(combinations(abba).toSet, abbacomb.toSet)
   }
 
+  test("combinations: abbaccc") {
+    val abbaccc = List(('a', 2), ('b', 2), ('c', 3))
+    val abbaccccomb = List(
+      List(),
+      List(('a', 1)),
+      List(('a', 2)),
+      List(('b', 1)),
+      List(('a', 1), ('b', 1)),
+      List(('a', 2), ('b', 1)),
+      List(('b', 2)),
+      List(('a', 1), ('b', 2)),
+      List(('a', 2), ('b', 2)),
+
+      List(('a', 1)), ('c', 1),
+      List(('a', 2)), ('c', 1),
+      List(('b', 1)), ('c', 1),
+      List(('a', 1), ('b', 1)), ('c', 1),
+      List(('a', 2), ('b', 1)), ('c', 1),
+      List(('b', 2)), ('c', 1),
+      List(('a', 1), ('b', 2)), ('c', 1),
+      List(('a', 2), ('b', 2)), ('c', 1),
+
+      List(('a', 1)), ('c', 2),
+      List(('a', 2)), ('c', 2),
+      List(('b', 1)), ('c', 2),
+      List(('a', 1), ('b', 1)), ('c', 2),
+      List(('a', 2), ('b', 1)), ('c', 2),
+      List(('b', 2)), ('c', 2),
+      List(('a', 1), ('b', 2)), ('c', 2),
+      List(('a', 2), ('b', 2)), ('c', 2),
+
+      List(('a', 1)), ('c', 3),
+      List(('a', 2)), ('c', 3),
+      List(('b', 1)), ('c', 3),
+      List(('a', 1), ('b', 1)), ('c', 3),
+      List(('a', 2), ('b', 1)), ('c', 3),
+      List(('b', 2)), ('c', 3),
+      List(('a', 1), ('b', 2)), ('c', 3),
+      List(('a', 2), ('b', 2)), ('c', 3)
+    )
+  }
+
   test("combinations: aaabbbcc (8pts)") {
-    val combs = combinations(List(('a', 3), ('b', 3)))
-    println(combs.length)
-    println(combs)
+    val combs = combinations(List(('a', 3), ('b', 3), ('c', 2)))
+    assert(combs.contains(List(('b', 2))))
+    assert(combs.contains(List(('c', 1))))
+    assert(combs.contains(List(('a', 3))))
+
   }
 
   test("combinations: aabb (8pts)") {
