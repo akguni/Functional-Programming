@@ -61,9 +61,22 @@ class AnagramsSuite extends munit.FunSuite:
   }
 
   test("combinations: aaabbbcc (8pts)") {
-    println(combinations(List(('a', 3), ('b', 3), ('c', 2))))
+    val combs = combinations(List(('a', 3), ('b', 3)))
+    println(combs.length)
+    println(combs)
   }
 
+  test("combinations: aabb (8pts)") {
+    val combs = combinations(List(('a', 2), ('b', 2)))
+    println(combs.length)
+    println(combs)
+  }
+
+  test("combinations: aa (8pts)") {
+    val combs = combinations(List(('a', 4)))
+    println(combs.length)
+    println(combs)
+  }
 
   test("sentence anagrams: [] (10pts)") {
     val sentence = List()

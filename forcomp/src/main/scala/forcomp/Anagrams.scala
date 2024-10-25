@@ -88,13 +88,21 @@ object Anagrams extends AnagramsInterface:
    */
   def combinations(occurrences: Occurrences): List[Occurrences] =
     occurrences match
-      case Nil => List(Nil)
-      case x :: xs =>
-        def subs(hd: (Char, Int), rest: Occurrences, combs: List[Occurrences]): List[Occurrences] = hd match
-          case (_, 0) => Nil
-          case (c, i) => ((for co <- combs yield (c, i) :: co) ::: combs) ::: subs((c, i - 1), rest, combs)
+    case Nil => List(Nil)
+    case (c, o) :: xs =>
+      val combs = combinations(xs)
+      def iter(cs : Set[Occurrences], newChar: (Char, Int)): Set[Occurrences] = newChar match
+        case (ch, 0) => Set(Nil)
+        case (ch, n) => iter2(cs.toList, (ch, n)).toSet ++ iter(cs, (ch, n - 1))
 
-        subs(x, xs, combinations(xs))
+        def iter2(cs : List[Occurrences], newChar: (Char, Int)): List[Occurrences] = newChar match
+          case (c, o) => cs ::: cs.map(occs => (c, o) :: occs)
+      iter(combs.toSet, (c, o)).toList
+
+
+
+
+
 
 
   /** Subtracts occurrence list `y` from occurrence list `x`.
