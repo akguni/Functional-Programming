@@ -1,6 +1,7 @@
 package forcomp
 
-import scala.io.{ Codec, Source }
+import java.security.InvalidParameterException
+import scala.io.{Codec, Source}
 
 object Anagrams extends AnagramsInterface:
 
@@ -36,11 +37,22 @@ object Anagrams extends AnagramsInterface:
    *  Note: you must use `groupBy` to implement this method!
    */
   def wordOccurrences(w: Word): Occurrences =
-    w.toLowerCase.groupBy(c => c).map((c, o) => (c, o.length)).toList.sortBy((c, _) => c)
+    w.toLowerCase
+      .groupBy(identity)
+      .map((c, o) => (c, o.length))
+      .toList.sortBy((c, _) => c)
 
   /** Converts a sentence into its character occurrence list. */
   def sentenceOccurrences(s: Sentence): Occurrences =
-    s.flatMap(wordOccurrences)
+    def merge(ox: Occurrences, oy: Occurrences): Occurrences = (ox, oy) match
+        case (Nil, oy) => oy
+        case (ox, Nil) => ox
+        case ((c1, o1) :: xs1, (c2, o2) :: ys1) =>
+          if c1 == c2 then (c1, o1 + o2) :: merge(xs1, ys1)
+          else if c1 < c2 then (c1, o1) :: merge(xs1, oy)
+          else (c2, o2) :: merge(ox, ys1)
+
+    s.foldLeft(Nil: Occurrences)((acc, w) => merge(acc, wordOccurrences(w)))
 
   /** The `dictionaryByOccurrences` is a `Map` from different occurrences to a sequence of all
    *  the words that have that occurrence count.
@@ -91,19 +103,13 @@ object Anagrams extends AnagramsInterface:
     case Nil => List(Nil)
     case (c, o) :: xs =>
       val combs = combinations(xs)
-      def iter(cs : List[Occurrences], newChar: (Char, Int)): List[Occurrences] = newChar match
+      def addSubsets(cs : List[Occurrences], newChar: (Char, Int)): List[Occurrences] = newChar match
         case (ch, 0) => Nil
-        case (ch, n) => iter2(cs, (ch, n)) ::: iter(cs, (ch, n - 1))
+        case (ch, n) => addChars(cs, (ch, n)) ++ addSubsets(cs, (ch, n - 1))
 
-        def iter2(cs : List[Occurrences], newChar: (Char, Int)): List[Occurrences] = newChar match
+        def addChars(cs : List[Occurrences], newChar: (Char, Int)): List[Occurrences] = newChar match
           case (c, o) => cs ::: cs.map(occs => (c, o) :: occs)
-      iter(combs, (c, o)).distinct
-
-
-
-
-
-
+      addSubsets(combs, (c, o)).distinct
 
   /** Subtracts occurrence list `y` from occurrence list `x`.
    *
@@ -116,9 +122,16 @@ object Anagrams extends AnagramsInterface:
    *  and has no zero-entries.
    */
   def subtract(x: Occurrences, y: Occurrences): Occurrences =
-//    x.filter()
+    def subtractChar(o: Occurrences, c: (Char, Int)): Occurrences =
+      val (ch, i) = c
+      o match
+      case Nil => Nil
+      case (oc, oi) :: rest =>
+        if oc < ch then (oc, oi) :: subtractChar(rest, c)
+        else if oc == ch then if oi > i then (oc, oi - i) :: rest else rest
+        else throw InvalidParameterException()
 
-    ???
+    y.foldLeft(x: Occurrences)((acc, c) => subtractChar(acc, c))
 
   /** Returns a list of all anagram sentences of the given sentence.
    *
@@ -160,7 +173,18 @@ object Anagrams extends AnagramsInterface:
    *
    *  Note: There is only one anagram of an empty sentence.
    */
-  def sentenceAnagrams(sentence: Sentence): List[Sentence] = ???
+  def sentenceAnagrams(sentence: Sentence): List[Sentence] =
+    def loop(occs: Occurrences): List[Sentence] = occs match
+      case Nil => List(Nil)
+      case xs =>
+        for c <- combinations(xs)
+          w <- dictionaryByOccurrences.getOrElse(c, Nil)
+          s <- loop(subtract(xs, wordOccurrences(w)))
+          if c.nonEmpty
+        yield w :: s
+
+    loop(sentenceOccurrences(sentence))
+
 
 object Dictionary:
   def loadDictionary: List[String] =

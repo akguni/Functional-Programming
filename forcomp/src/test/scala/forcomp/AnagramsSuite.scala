@@ -16,6 +16,11 @@ class AnagramsSuite extends munit.FunSuite:
     assertEquals(sentenceOccurrences(List("abcd", "e")), List(('a', 1), ('b', 1), ('c', 1), ('d', 1), ('e', 1)))
   }
 
+  test("sentenceOccurrences: I love you") {
+    assertEquals(sentenceOccurrences(List("I", "love", "you"))
+      , List(('e', 1), ('i', 1), ('l', 1), ('o', 2), ('u', 1), ('v', 1), ('y', 1)))
+  }
+
 
   test("dictionaryByOccurrences.get: eat (10pts)") {
     assertEquals(dictionaryByOccurrences.get(List(('a', 1), ('e', 1), ('t', 1))).map(_.toSet), Some(Set("ate", "eat", "tea")))
@@ -37,6 +42,16 @@ class AnagramsSuite extends munit.FunSuite:
     val r = List(('r', 1))
     val lad = List(('a', 1), ('d', 1), ('l', 1))
     assertEquals(subtract(lard, r), lad)
+  }
+
+
+  test("subtract: hello - l") {
+    val hello = List(('h', 1), ('e', 1), ('l', 2), ('o', 1))
+    val l = List(('l', 1))
+    val helo = List(('h', 1), ('e', 1), ('l', 1), ('o', 1))
+    assertEquals(subtract(hello, l), helo)
+    val heo = List(('h', 1), ('e', 1), ('o', 1))
+    assertEquals(subtract(helo, l), heo)
   }
 
 
@@ -110,21 +125,31 @@ class AnagramsSuite extends munit.FunSuite:
 
   }
 
-  test("combinations: aabb (8pts)") {
-    val combs = combinations(List(('a', 2), ('b', 2)))
-    println(combs.length)
-    println(combs)
-  }
+//  test("combinations: aabb (8pts)") {
+//    val combs = combinations(List(('a', 2), ('b', 2)))
+//    println(combs.length)
+//    println(combs)
+//  }
 
-  test("combinations: aa (8pts)") {
-    val combs = combinations(List(('a', 4)))
-    println(combs.length)
-    println(combs)
-  }
+//  test("combinations: aa (8pts)") {
+//    val combs = combinations(List(('a', 4)))
+//    println(combs.length)
+//    println(combs)
+//  }
 
   test("sentence anagrams: [] (10pts)") {
     val sentence = List()
     assertEquals(sentenceAnagrams(sentence), List(Nil))
+  }
+
+  test("Exercise test: I love you") {
+    val sentence = List("I", "love", "you")
+    assertEquals(sentenceAnagrams(sentence),
+      List(List("you", "I", "love"), List("you", "Io", "Lev"),
+        List("you", "Lev", "Io"), List("you", "love", "I"), List("you", "olive"),
+        List("I", "you", "love"), List("I", "love", "you"), List("Io", "you", "Lev"),
+        List("Io", "Lev", "you"), List("Lev", "you", "Io"), List("Lev", "Io", "you"),
+        List("love", "you", "I"), List("love", "I", "you"), List("olive", "you")))
   }
 
   test("sentence anagrams: Linux rulez (10pts)") {
